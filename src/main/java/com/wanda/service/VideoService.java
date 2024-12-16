@@ -87,6 +87,8 @@ public class VideoService {
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_NOT_FOUND);
         }
 
+        processVideo(saveVideo);
+
         return this.videoRepository.save(saveVideo);
     }
 
@@ -136,7 +138,7 @@ public class VideoService {
         headers.add(HttpHeaders.EXPIRES, "0");
         headers.add("X-Content-Type-Options", "nosniff");
 
-        processVideo(video);
+
 
         return new VideoResourceDTO(headers, contentType, contentLength, path,  rangeStart, rangeEnd);
     }
@@ -200,5 +202,6 @@ public class VideoService {
 
         return new FileSystemResource(filePath.toFile());
     }
+
 
 }

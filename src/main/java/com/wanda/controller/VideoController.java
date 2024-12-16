@@ -12,6 +12,7 @@ import com.wanda.utils.exceptions.enums.SuccessCode;
 import com.wanda.utils.exceptions.response.SuccessResponse;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -90,10 +91,29 @@ public class VideoController {
 
         return ResponseEntity
                 .ok()
+                .contentType(MediaType.parseMediaType("application/vnd.apple.mpegurl"))
                 .body(masterFile);
     }
 
+    @GetMapping("/video/hls/{videoId}/{segmentName}")
+    public ResponseEntity<Resource> serveHlsSegment(@PathVariable String videoId, @PathVariable String segmentName) {
 
+        String filePath = "videos/" + videoId + "/" + "hls" + "/" + segmentName;
+
+        System.out.println(filePath);
+
+        Path path = Paths.get(filePath);
+        if (!Files.exists(path)) {
+            throw new CustomException("File not found", HttpStatus.NOT_FOUND, ErrorCode.FILE_NOT_FOUND);
+        }
+
+
+            Resource resource = new FileSystemResource(path);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("video/MP2T"))
+                    .body(resource);
+
+    }
     }
 
 

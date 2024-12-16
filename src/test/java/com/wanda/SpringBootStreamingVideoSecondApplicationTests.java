@@ -25,7 +25,7 @@ class SpringBootStreamingVideoSecondApplicationTests {
 
 //        this.videoService.processVideo(video.get());
 
-        this.videoService.getMasterFile("6efa70bc-52f3-4fb7-8be4-613c6d553605");
+//        this.videoService.getMasterFile("6efa70bc-52f3-4fb7-8be4-613c6d553605");
 
     }
 
