@@ -1,0 +1,31 @@
+
+spring:
+  application:
+    name: Spring_Video_Streaming
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/Spring_Video_Stream
+    username: root
+    password: 2002
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # Use 'create', 'create-drop', 'validate', or 'update' based on your requirements
+    show-sql: true      # Enables SQL query logging in the console
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect  # Use the appropriate dialect for your MySQL version
+
+  servlet:
+    multipart:
+      max-file-size: 20000MB
+      max-request-size: 20000MB
+
+
+video:
+  directory: videos
+
+
+server:
+  port: 9091
+
