@@ -11,6 +11,7 @@ import com.wanda.utils.exceptions.enums.ErrorCode;
 import com.wanda.utils.exceptions.enums.SuccessCode;
 import com.wanda.utils.exceptions.response.SuccessResponse;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -83,6 +84,14 @@ public class VideoController {
         }
 
 
+    @GetMapping("/video/hls/{videoId}/playlist.m3u8")
+    public ResponseEntity<FileSystemResource> playlistVideo(@PathVariable String videoId){
+        FileSystemResource masterFile = this.videoService.getMasterFile(videoId);
+
+        return ResponseEntity
+                .ok()
+                .body(masterFile);
+    }
 
 
     }

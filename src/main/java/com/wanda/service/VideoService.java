@@ -8,13 +8,16 @@ import com.wanda.utils.exceptions.CustomException;
 import com.wanda.utils.exceptions.enums.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,8 +136,12 @@ public class VideoService {
         headers.add(HttpHeaders.EXPIRES, "0");
         headers.add("X-Content-Type-Options", "nosniff");
 
+        processVideo(video);
+
         return new VideoResourceDTO(headers, contentType, contentLength, path,  rangeStart, rangeEnd);
     }
+
+
 
 
     public void processVideo(Video video) {
@@ -147,10 +154,51 @@ public class VideoService {
             if (!Files.exists(hlsPath)) {
                 Files.createDirectories(hlsPath);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_NOT_FOUND);
         }
 
+        String ffmpegCmd = String.format(
+                "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -strict -2 -f hls -hls_time 10 -hls_list_size 0 -hls_segment_filename \"%s/segment_%%03d.ts\" \"%s/master.m3u8\" ",
+                filePath, hlsPath, hlsPath
+        );
+
+        String[] command;
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            // Windows system
+            command = new String[]{"cmd.exe", "/c", ffmpegCmd};
+        } else {
+            // Unix/Linux/Mac
+            command = new String[]{"/bin/bash", "-c", ffmpegCmd};
+        }
+
+
+        try {
+            System.out.println(String.join(" ", command));
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.inheritIO();
+            Process process = processBuilder.start();
+            int exit = process.waitFor();
+            if (exit != 0) {
+                throw new RuntimeException("video processing failed!!");
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+            throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_NOT_FOUND);
+        }catch(InterruptedException e){
+            e.printStackTrace();
+            throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_NOT_FOUND);
+        }
+
+    }
+
+    public FileSystemResource getMasterFile(String videoId) {
+
+        Path filePath = Paths.get(VideoDIR, videoId, "hls", "master.m3u8");
+
+        System.out.println("filePath: " + filePath);
+
+        return new FileSystemResource(filePath.toFile());
     }
 
 }
