@@ -23,5 +23,7 @@ public class Video {
 
     private String filePath;
 
+    private String contentType;
+
 
 }
