@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
                 e.getCode()
         );
 
+        System.out.println("error "+error);
         return new ResponseEntity<>(error, e.getStatusCode());
     }
 
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
                 (e.getMessage() != null) ? e.getMessage() : "Internal Server Error",
                 (e.getCode() == null) ? ErrorCode.GENERAL_ERROR : e.getCode()
         );
-
+        System.out.println("error exception "+error);
         return new ResponseEntity<>(error, e.getStatusCode());
     }
 }

@@ -26,6 +26,8 @@ video:
   directory: videos
 
 
+
+
 server:
   port: 9091
 
